@@ -1,122 +1,70 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Routes, Route, Navigate } from "react-router-dom";
+import FlowerBackground from "./components/FlowerBackground";
+import LockScreen from "./pages/LockScreen";
+import Opening from "./pages/Opening";
+import WordsForYou from "./pages/WordsForYou";
+import SheLoves from "./pages/SheLoves";
+import WhatAreYou from "./pages/WhatAreYou";
+import FriendshipWrapped from "./pages/FriendshipWrapped";
+import Roast from "./pages/Roast";
+import Awards from "./pages/Awards";
+import OpenWhen from "./pages/OpenWhen";
+import SpinTheWheel from "./pages/SpinTheWheel";
+import YouAreSoLoved from "./pages/YouAreSoLoved";
+import Ending from "./pages/Ending";
 
-function App() {
-  const [count, setCount] = useState(0)
+const UNLOCK_DATE = new Date("2026-07-02T00:00:00");
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+function isUnlocked() {
+  // return new Date() >= UNLOCK_DATE;
+  return true;
 }
 
-export default App
+// Wraps every page with the flower background
+function Layout({ children }) {
+  return (
+    <div style={{ position: "relative", minHeight: "100vh" }}>
+      <FlowerBackground />
+      <div style={{ position: "relative", zIndex: 1 }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// Guards routes behind the unlock date
+function ProtectedRoute({ children }) {
+  if (!isUnlocked()) {
+    return <Navigate to="/" replace />;
+  }
+  return <Layout>{children}</Layout>;
+}
+
+export default function App() {
+  return (
+      <Routes>
+        {/* Lock screen — always accessible, redirects inside if unlocked */}
+        <Route
+          path="/"
+          element={
+            isUnlocked()
+              ? <Navigate to="/opening" replace />
+              : <LockScreen unlockDate={UNLOCK_DATE} />
+          }
+        />
+
+        {/* All real pages — locked until July 2nd */}
+        <Route path="/opening"            element={<ProtectedRoute><Opening /></ProtectedRoute>} />
+        <Route path="/words"              element={<ProtectedRoute><WordsForYou /></ProtectedRoute>} />
+        <Route path="/things-she-loves"   element={<ProtectedRoute><SheLoves /></ProtectedRoute>} />
+        <Route path="/what-are-you"       element={<ProtectedRoute><WhatAreYou /></ProtectedRoute>} />
+        <Route path="/wrapped"            element={<ProtectedRoute><FriendshipWrapped /></ProtectedRoute>} />
+        <Route path="/roast"              element={<ProtectedRoute><Roast /></ProtectedRoute>} />
+        <Route path="/awards"             element={<ProtectedRoute><Awards /></ProtectedRoute>} />
+        <Route path="/open-when"          element={<ProtectedRoute><OpenWhen /></ProtectedRoute>} />
+        <Route path="/spin"               element={<ProtectedRoute><SpinTheWheel /></ProtectedRoute>} />
+        <Route path="/so-loved"           element={<ProtectedRoute><YouAreSoLoved /></ProtectedRoute>} />
+        <Route path="/ending"             element={<ProtectedRoute><Ending /></ProtectedRoute>} />
+      </Routes>
+  );
+}
